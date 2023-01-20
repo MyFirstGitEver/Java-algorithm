@@ -1,0 +1,158 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+public class Main 
+{
+	public static void main(String[] args)
+	{
+		HashMap<Pair, Boolean> visited = new HashMap<>();
+		
+		String str = "L4, R2, R4, L5, L3, L1, R4, R5, R1, R3, L3, L2, L2, R5, R1, L1, L2, R2, R2, L5, R5, R5, L2, R1, R2, L2, L4, L1, R5, R2, R1, R1, L2, L3, R2, L5, L186, L5, L3, R3, L5, R4, R2, L5, R1, R4, L1, L3, R3, R1, L1, R4, R2, L1, L4, R5, L1, R50, L4, R3, R78, R4, R2, L4, R3, L4, R4, L1, R5, L4, R1, L2, R3, L2, R5, R5, L4, L1, L2, R185, L5, R2, R1, L3, R4, L5, R2, R4, L3, R4, L2, L5, R1, R2, L2, L1, L2, R2, L2, R1, L5, L3, L4, L3, L4, L2, L5, L5, R2, L3, L4, R4, R4, R5, L4, L2, R4, L5, R3, R1, L1, R3, L2, R2, R1, R5, L4, R5, L3, R2, R3, R1, R4, L4, R1, R3, L5, L1, L3, R2, R1, R4, L4, R3, L3, R3, R2, L3, L3, R4, L2, R4, L3, L4, R5, R1, L1, R5, R3, R1, R3, R4, L1, R4, R3, R1, L5, L5, L4, R4, R3, L2, R1, R5, L3, R4, R5, L4, L5, R2";
+		
+		String[] ins = str.split(",");
+		
+		for(int i=0;i<ins.length;i++)
+			ins[i] = ins[i].replace(" ", "");
+		
+		int x = 0, y = 0;
+		
+		char curr = 'U';
+		visited.put(new Pair(0, 0), true);
+		
+		for(String in : ins)
+		{
+			char direction = in.charAt(0);
+			int steps = Integer.parseInt(in.substring(1));
+			
+			curr = changeDirection(curr, direction);
+			
+			boolean vis = false;
+			Pair ans = null;
+			
+			switch (curr)
+			{
+			case 'U':
+				for(int i=y+1;i<=y+steps;i++)
+				{
+					ans = new Pair(x, i);
+					vis = get(visited, ans);
+					
+					if(vis)
+						break;
+				}
+				
+				y += steps;
+				break;
+			case 'D':
+				for(int i=y-1;i>=y-steps;i--)
+				{
+					ans = new Pair(x, i);
+					vis = get(visited, ans);
+					
+					if(vis)
+						break;
+				}
+				
+				y -= steps;
+				break;
+			case 'L':
+				for(int i=x-1;i>=x-steps;i--)
+				{
+					ans = new Pair(i, y);
+					vis = get(visited, ans);
+					
+					if(vis)
+						break;
+				}
+				
+				x -= steps;
+				break;
+			default:
+				for(int i=x+1;i<=x+steps;i++)
+				{
+					ans = new Pair(i, y);
+					vis = get(visited, ans);
+					
+					if(vis)
+						break;
+				}
+				
+				x += steps;
+				break;
+			}
+			
+			if(vis)
+			{
+				System.out.print(Math.abs(ans.x) + Math.abs(ans.y));
+				break;
+			}
+		}
+	}
+	
+	public static boolean get(HashMap<Pair, Boolean> hm, Pair p)
+	{
+		if(hm.get(p) == null)
+		{
+			hm.put(p, true);
+			return false;
+		}
+		else
+			return true;
+	}
+	
+	public static char changeDirection(char curr, char turn)
+	{
+		char[] dirs = {'D', 'L', 'U', 'R'};
+		
+		int pos = 0;
+		
+		for(int i=0;i<4;i++)
+		{
+			if(dirs[i] == curr)
+			{
+				pos = i;
+				break;
+			}
+		}
+		
+		if(turn == 'L')
+		{
+			pos--;
+			if(pos == -1)
+				pos = 3;
+		}
+		else
+			pos = (pos + 1) % 4;
+		
+		return dirs[pos];
+	}
+}
+
+class Pair
+{
+	public final int x;
+	public final int y;
+	
+	public Pair(int x, int y)
+	{
+		this.x = x;
+		this.y = y;
+	}
+
+	@Override
+	public boolean equals(Object obj) 
+	{
+		if(!(obj instanceof Pair))
+			return false;
+		
+		Pair p = (Pair)obj;
+		return (x == p.x && y == p.y);
+	}
+
+	@Override
+	public int hashCode() 
+	{
+		return x*-3123 + y;
+	}
+}
