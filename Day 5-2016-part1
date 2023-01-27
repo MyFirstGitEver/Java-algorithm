@@ -1,0 +1,113 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Main {	
+	public static void main(String[] args){
+		List<Room> rooms = new ArrayList<>();
+		
+		BufferedReader reader;
+		
+		try {
+			reader = new BufferedReader(new FileReader("D:\\advent.txt"));
+			String line = reader.readLine();
+		
+			while (line != null) {
+				rooms.add(new Room(line));
+				line = reader.readLine();
+			}
+		
+			reader.close();
+		}
+		catch (Exception e) {
+			System.out.print(e.toString());
+		}
+		
+		long ans = 0;
+		
+		for(Room room : rooms) {
+			if(room.isReal()) {
+				ans += room.sectorId;
+			}
+		}
+		
+		System.out.print(ans);
+	}
+}
+
+class Room{
+	public int sectorId;
+	public String checkSum, name;
+	
+	public Room(String info) {
+		int index = 0;
+		info = info.replace("-", "");
+		
+		for(int i=0;i<info.length();i++) {
+			if(info.charAt(i) >= '0' && info.charAt(i) <= '9') {
+				index = i;
+				break;
+			}
+		}
+		
+		int open = info.indexOf('[');
+		int close = info.indexOf(']');
+		
+		name = info.substring(0, index);
+		sectorId = Integer.parseInt(info.substring(index, open));
+		checkSum = info.substring(open + 1, close);
+	}
+	
+	public boolean isReal() {
+		HashMap<Character, Integer> map = new HashMap<>();
+		
+		for(int i=0;i<name.length();i++) {
+			char c = name.charAt(i);
+			
+			Integer count = map.get(c);
+			
+			if(count == null) {
+				map.put(c, 1);
+			}
+			else {
+				map.put(c, map.get(c) + 1);
+			}
+		}
+		
+		List<MyChar> chars = new ArrayList<>();
+		for(Map.Entry<Character, Integer> entry : map.entrySet()) {
+			chars.add(new MyChar(entry.getKey(), entry.getValue()));
+		}
+		
+		Collections.sort(chars);
+		
+		StringBuilder builder = new StringBuilder();
+		for(int i=0;i<Math.min(5, chars.size());i++) {
+			builder.append(chars.get(i).c);
+		}
+		
+		return builder.toString().equals(checkSum);
+	}
+}
+
+class MyChar implements Comparable<MyChar>{
+	char c;
+	int count;
+	
+	public MyChar(char c, int count) {
+		this.c = c;
+		this.count = count;
+	}
+
+	@Override
+	public int compareTo(MyChar o) {
+		if(count != o.count)
+			return o.count - count;
+		
+		return c - o.c;
+	}
+}
