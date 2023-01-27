@@ -1,0 +1,84 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Main {	
+	public static void main(String[] args){
+		List<HashMap<Character, Integer>> counters = new 
+				ArrayList<>();
+		List<MyChar> message = new ArrayList<>();
+		
+		for(int i=0;i<8;i++) {
+			counters.add(new HashMap<>());
+			message.add(new MyChar('!', -1));
+		}
+		
+		BufferedReader reader;
+		
+		try {
+			reader = new BufferedReader(new FileReader("D:\\advent.txt"));
+			String line = reader.readLine();
+		
+			while (line != null) {
+				for(int i=0;i<line.length();i++) {
+					char c = line.charAt(i);
+					
+					Integer counter = counters.get(i).get(c);
+					
+					if(counter == null) {
+						counters.get(i).put(c, 1);
+					}
+					else {
+						counters.get(i).put(c, counter + 1);
+					}
+				}
+				
+				line = reader.readLine();
+			}
+		
+			reader.close();
+		}
+		catch (Exception e) {
+			System.out.print(e.toString());
+		}
+		
+		for(int i=0;i<8;i++) {
+			HashMap<Character, Integer> counter = counters.get(i);
+			
+			for(Map.Entry<Character, Integer> entry : counter.entrySet()) {
+				if(message.get(i).count < entry.getValue()){
+					message.set(i, new MyChar(entry.getKey(), entry.getValue()));
+				}
+			}
+		}
+		
+		StringBuilder builder = new StringBuilder();
+		
+		for(MyChar piece : message) {
+			builder.append(piece.c);
+		}
+		
+		System.out.print(builder.toString());
+	}
+}
+
+class MyChar implements Comparable<MyChar>{
+	char c;
+	int count;
+	
+	public MyChar(char c, int count) {
+		this.c = c;
+		this.count = count;
+	}
+
+	@Override
+	public int compareTo(MyChar o) {
+		if(count != o.count)
+			return o.count - count;
+		
+		return c - o.c;
+	}
+}
