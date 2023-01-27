@@ -1,0 +1,90 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.HashSet;
+import java.util.Set;
+
+public class Main {	
+	public static void main(String[] args){
+		BufferedReader reader;
+		
+		int cnt = 0;
+		try {
+			reader = new BufferedReader(new FileReader("D:\\advent.txt"));
+			String line = reader.readLine();
+		
+			while (line != null) {
+				if(check(line))
+					cnt++;
+				
+				
+				line = reader.readLine();
+			}
+		
+			reader.close();
+		}
+		catch (Exception e) {
+			System.out.print(e.toString());
+		}
+		
+		System.out.print(cnt);
+	}
+	
+	static boolean check(String str) {
+		int last = 0;
+		
+		Set<String> outsides = new HashSet<>();
+		Set<String> insides = new HashSet<>();
+		
+		while(true) {
+			int open = str.indexOf('[', last);
+			
+			if(open == -1)
+				break;
+			
+			int close = str.indexOf(']', last);
+			
+			String outside = str.substring(last, open);
+			String inside = str.substring(open + 1, close);
+			
+			getAllValids(outside, outsides);
+			insides.add(inside);
+			
+			last = close + 1;
+		}
+		
+		getAllValids(str.substring(last), outsides);
+		
+		String[] outsideList = outsides.toArray(new String[outsides.size()]);
+		String[] insideList = insides.toArray(new String[insides.size()]);
+		
+		for(String inside : insideList) {
+			for(String outside : outsideList) {
+				boolean contains = inside.contains(reverse(outside));
+				
+				if(contains)
+					return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	static String reverse(String str) {
+		return new StringBuilder()
+				.append(str.charAt(1))
+				.append(str.charAt(0))
+				.append(str.charAt(1)).toString();
+	}
+	
+	static void getAllValids(String str, Set<String> list) {
+		for(int i=0;i<=str.length() - 3;i++) {
+			String sub = str.substring(i, i + 3);
+			
+			if((sub.charAt(0) != sub.charAt(2)) ||
+					sub.charAt(1) == sub.charAt(0))
+				continue;
+		
+			list.add(sub);
+		}
+	}
+}
